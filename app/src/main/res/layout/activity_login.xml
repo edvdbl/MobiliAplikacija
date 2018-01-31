@@ -72,10 +72,11 @@
         android:text="Registruotis"/>
 
     <CheckBox
+        android:id="@+id/rememberMe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:checked="true"
         android:text="Prisiminti mane"
-        android:textColor="@color/colorTextWhite"
-        />
+        android:textColor="@color/colorTextWhite" />
 
 </LinearLayout>
