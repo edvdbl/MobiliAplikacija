@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Mobili Aplikacija</string>
+    <string name="login_invalid_username">Klaidingai įvestas prisijungimo vardas</string>
+    <string name="login_invalid_password">Klaidingai įvestas slaptažodis</string>
+</resources>
