@@ -31,6 +31,8 @@ public class NewEntryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_entry);
 
+        setTitle(R.string.new_entry_label);
+
         btnSubmit = (Button) findViewById(R.id.btnAdd);
         etId = (EditText) findViewById(R.id.etId);
         etName = (EditText) findViewById(R.id.etName);
