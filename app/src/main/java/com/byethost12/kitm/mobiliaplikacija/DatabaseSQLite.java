@@ -121,4 +121,14 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
         // return users list
         return users;
     }
+
+    public boolean isValidUser(String username, String password){
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT * FROM " + TABLE_USERS + " WHERE "
+                        + USER_NAME + "='" + username + "'AND " +
+                        USER_PASSWORD + "='" + password + "'" , null);
+        if (c.getCount() > 0)
+            return true;
+        return false;
+    }
 }
