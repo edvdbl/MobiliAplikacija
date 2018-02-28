@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +27,8 @@ public class SearchActivity extends AppCompatActivity {
     PokemonAdapter pokemonAdapter;
 
     List<Pokemonas> pokemonaiSQLite = Collections.emptyList();
-    List<Pokemonas> pokemonaiPaieskai = Collections.emptyList();
+
+    List<Pokemonas> pokemonaiPaieskai = new ArrayList<Pokemonas>();
 
     DatabaseSQLite db;
 
@@ -39,7 +41,7 @@ public class SearchActivity extends AppCompatActivity {
 
         db = new DatabaseSQLite(SearchActivity.this);
 
-         // Taupydami duomenų bazės resursus, darome 1 call'ą (getAllPokemonai) užkrovus paieškos langą,
+        // Taupydami duomenų bazės resursus, darome 1 call'ą (getAllPokemonai) užkrovus paieškos langą,
         // vėliau (not implemented) pokemonų ieškome iš užpildyto sąrašo
         pokemonaiSQLite = db.getAllPokemonai();
 
@@ -124,20 +126,21 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-
             // jeigu negaila db resursų, galima kiekvieną kartą call'inti pagal įvestus kriterijus paieškos
-            pokemonaiSQLite = db.getPokemonByName(searchQuery);
+            //pokemonaiSQLite = db.getPokemonByName(searchQuery);
+
+            if (!pokemonaiPaieskai.isEmpty()) {
+                pokemonaiPaieskai.clear();
+            }
 
             // vartotojo paieska vykdoma sarase (ne db)
-            //TODO iteruoja per cikla kol suranda tinkama ir tada uzluzta.
-           /* for (int i = 1 ; i <pokemonaiSQLite.size();i++) {
-                if (pokemonaiSQLite.get(i).getName().equals(searchQuery)) {
-                    Toast.makeText(SearchActivity.this, pokemonaiSQLite.get(i).toString(), Toast.LENGTH_SHORT).show();
-                    //pokemonaiPaieskai.add(pokemonaiSQLite.get(i));
+            for (int i = 0 ; i <pokemonaiSQLite.size();i++) {
+                if (pokemonaiSQLite.get(i).getName().contains(searchQuery)) {
+                    pokemonaiPaieskai.add(pokemonaiSQLite.get(i));
                 }
-            }*/
+            }
 
-            if (pokemonaiSQLite.isEmpty()) {
+            if (pokemonaiPaieskai.isEmpty()) {
                 return "no rows";
             } else {
                 return "rows";
@@ -149,7 +152,7 @@ public class SearchActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             progressDialog.dismiss();
 
-            setRecycleView(pokemonaiSQLite);
+            setRecycleView(pokemonaiPaieskai);
         }
     }
 }
