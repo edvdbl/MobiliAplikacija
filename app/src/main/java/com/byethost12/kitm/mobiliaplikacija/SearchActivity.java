@@ -20,9 +20,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
-
-    Button btnPrideti;
     SearchView searchView = null;
+
+    RecyclerView rvPokemonai;
+    PokemonAdapter pokemonAdapter;
+
+    List<Pokemonas> pokemonaiSQLite = Collections.emptyList();
+    List<Pokemonas> pokemonaiPaieskai = Collections.emptyList();
+
+    DatabaseSQLite db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +37,19 @@ public class SearchActivity extends AppCompatActivity {
 
         setTitle(R.string.search_label);
 
-        btnPrideti = (Button) findViewById(R.id.btnPrideti);
+        db = new DatabaseSQLite(SearchActivity.this);
+
+         // Taupydami duomenų bazės resursus, darome 1 call'ą (getAllPokemonai) užkrovus paieškos langą,
+        // vėliau (not implemented) pokemonų ieškome iš užpildyto sąrašo
+        pokemonaiSQLite = db.getAllPokemonai();
+
+        if (!pokemonaiSQLite.isEmpty()) {
+            setRecycleView(pokemonaiSQLite);
+        } else {
+            Toast.makeText(this, "Duomenų bazėje nėra įrašų", Toast.LENGTH_SHORT).show();
+        }
+
+        Button btnPrideti = (Button) findViewById(R.id.btnPrideti);
         btnPrideti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,10 +95,20 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /*
+        setup and hand over list pokemonaiSQLite to recyclerview
+        @params list of pokemonai from db
+     */
+    private void setRecycleView(List<Pokemonas> pokemonaiSQLite) {
+        rvPokemonai = (RecyclerView) findViewById(R.id.pokemon_list);
+        pokemonAdapter = new PokemonAdapter(SearchActivity.this, pokemonaiSQLite);
+        rvPokemonai.setAdapter(pokemonAdapter);
+        rvPokemonai.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
+    }
+
     class AsyncFetch extends AsyncTask<String, String, String> {
         ProgressDialog progressDialog = new ProgressDialog(SearchActivity.this);
         String searchQuery;
-        List<Pokemonas> pokemonai = Collections.emptyList();
 
         public AsyncFetch(String searchQuery) {
             this.searchQuery = searchQuery;
@@ -97,30 +125,31 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            DatabaseSQLite db = new DatabaseSQLite(SearchActivity.this);
+            // jeigu negaila db resursų, galima kiekvieną kartą call'inti pagal įvestus kriterijus paieškos
+            pokemonaiSQLite = db.getPokemonByName(searchQuery);
 
-            // TODO: 2 laboro užduotis
-            pokemonai = db.getAllPokemonai();
-            if (pokemonai.isEmpty()) {
+            // vartotojo paieska vykdoma sarase (ne db)
+            //TODO iteruoja per cikla kol suranda tinkama ir tada uzluzta.
+           /* for (int i = 1 ; i <pokemonaiSQLite.size();i++) {
+                if (pokemonaiSQLite.get(i).getName().equals(searchQuery)) {
+                    Toast.makeText(SearchActivity.this, pokemonaiSQLite.get(i).toString(), Toast.LENGTH_SHORT).show();
+                    //pokemonaiPaieskai.add(pokemonaiSQLite.get(i));
+                }
+            }*/
+
+            if (pokemonaiSQLite.isEmpty()) {
                 return "no rows";
             } else {
                 return "rows";
             }
+
         }
 
         @Override
         protected void onPostExecute(String result) {
             progressDialog.dismiss();
-            if (result.equals("no rows")) {
-                Toast.makeText(SearchActivity.this, "Pagal paiešką nerasta duomenų", Toast.LENGTH_LONG).show();
-            } else {
-                //setup and hand over list pokemonai to recyclerview
-                RecyclerView rvPokemonai = (RecyclerView) findViewById(R.id.pokemon_list);
-                PokemonAdapter pokemonAdapter = new PokemonAdapter(SearchActivity.this, pokemonai);
-                rvPokemonai.setAdapter(pokemonAdapter);
-                rvPokemonai.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
 
-            }
+            setRecycleView(pokemonaiSQLite);
         }
     }
 }

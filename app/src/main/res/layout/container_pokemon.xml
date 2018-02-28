@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="10dp">
     <TextView
         android:id="@+id/pavadinimas"
@@ -22,6 +22,17 @@
         android:textColor="@color/colorPrimaryDark"
         android:layout_margin="5dp"
         android:layout_below="@+id/pavadinimas"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="ID :"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_margin="5dp"
+        android:layout_below="@+id/galia"
         android:layout_alignParentRight="true" />
 
     <TextView

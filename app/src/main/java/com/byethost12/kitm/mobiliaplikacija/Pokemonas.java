@@ -81,4 +81,17 @@ public class Pokemonas {
     public void setType(String type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "Pokemonas{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", weight=" + weight +
+                ", height=" + height +
+                ", cp='" + cp + '\'' +
+                ", abilities='" + abilities + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

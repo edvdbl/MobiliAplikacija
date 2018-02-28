@@ -19,7 +19,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private Context context;
     private LayoutInflater inflater;
     private List<Pokemonas> pokemonai = Collections.emptyList();
-    private Pokemonas currentPokemon;
+    //private Pokemonas currentPokemon;
 
     public static final String ENTRY = "com.byethost12.kitm.mobiliaplikacija";
 
@@ -45,10 +45,11 @@ public class PokemonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         //get current position of item in
         // recyclerview to bind data and assign value from list
         MyHolder myHolder = (MyHolder) holder;
-        currentPokemon = pokemonai.get(position);
+        Pokemonas currentPokemon = pokemonai.get(position);
         myHolder.tvPavadinimas.setText(           currentPokemon.getName());
         myHolder.tvTipas.setText("Tipas: "      + currentPokemon.getType());
         myHolder.tvGalia.setText("Galia: "      + currentPokemon.getCp());
+        myHolder.tvId.setText("ID: "            + currentPokemon.getId());
         myHolder.tvSavybes.setText("Savybės: "  + currentPokemon.getAbilities());
     }
 
@@ -58,14 +59,15 @@ public class PokemonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class MyHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView tvPavadinimas,tvTipas,tvGalia,tvSavybes;
+        TextView tvPavadinimas,tvTipas,tvGalia,tvSavybes, tvId;
 
         public MyHolder(View itemView){
             super(itemView);
-            tvPavadinimas = (TextView)itemView.findViewById(R.id.pavadinimas);
-            tvTipas = (TextView)itemView.findViewById(R.id.tipas);
-            tvGalia = (TextView)itemView.findViewById(R.id.galia);
-            tvSavybes = (TextView)itemView.findViewById(R.id.savybes);
+            tvPavadinimas   = (TextView)itemView.findViewById(R.id.pavadinimas);
+            tvTipas         = (TextView)itemView.findViewById(R.id.tipas);
+            tvGalia         = (TextView)itemView.findViewById(R.id.galia);
+            tvSavybes       = (TextView)itemView.findViewById(R.id.savybes);
+            tvId            = (TextView)itemView.findViewById(R.id.id);
             itemView.setOnClickListener(this);
         }
 

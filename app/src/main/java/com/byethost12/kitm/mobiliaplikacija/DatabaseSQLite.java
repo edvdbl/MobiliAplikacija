@@ -24,6 +24,15 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
     private static final String USER_PASSWORD   = "password";
     private static final String USER_EMAIL      = "email";
 
+    private static final String TABLE_POKEMONS      = "pokemonai";
+    private static final String POKEMON_ID          = "id";
+    private static final String POKEMON_NAME        = "name";
+    private static final String POKEMON_CP          = "cp";
+    private static final String POKEMON_ABILITIES   = "abilities";
+    private static final String POKEMON_TYPE        = "type";
+    private static final String POKEMON_WEIGHT      = "weight";
+    private static final String POKEMON_HEIGHT      = "height";
+
     public DatabaseSQLite(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -35,8 +44,19 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
                 + USER_LEVEL + " TEXT,"
                 + USER_NAME + " TEXT,"
                 + USER_PASSWORD + " TEXT,"
-                + USER_EMAIL + " TEXT," + ")";
+                + USER_EMAIL + ")";
+
+        String CREATE_POKEMONS_TABLE = "CREATE TABLE " + TABLE_POKEMONS + "("
+                + POKEMON_ID + " INTEGER PRIMARY KEY,"
+                + POKEMON_NAME + " TEXT,"
+                + POKEMON_CP + " TEXT,"
+                + POKEMON_ABILITIES + " TEXT,"
+                + POKEMON_TYPE + " TEXT,"
+                + POKEMON_WEIGHT + " REAL,"
+                + POKEMON_HEIGHT + ")";
+
         db.execSQL(CREATE_USERS_TABLE);
+        db.execSQL(CREATE_POKEMONS_TABLE);
     }
 
     @Override
@@ -122,6 +142,86 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
         return users;
     }
 
+    void addPokemon(Pokemonas pokemonas) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(POKEMON_NAME,        pokemonas.getName());
+        values.put(POKEMON_CP,          pokemonas.getCp());
+        values.put(POKEMON_ABILITIES,   pokemonas.getAbilities());
+        values.put(POKEMON_TYPE,        pokemonas.getType());
+        values.put(POKEMON_WEIGHT,      pokemonas.getWeight());
+        values.put(POKEMON_HEIGHT,      pokemonas.getHeight());
+
+        // Inserting Row
+        db.insert(TABLE_POKEMONS, null, values);
+
+        // Closing database connection
+        db.close();
+    }
+
+    public List<Pokemonas> getAllPokemonai() {
+        List<Pokemonas> pokemonai = new ArrayList<Pokemonas>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_POKEMONS;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Pokemonas pokemonas = new Pokemonas();
+
+                pokemonas.setId(Integer.parseInt(cursor.getString(0)));
+                pokemonas.setName(cursor.getString(1));
+                pokemonas.setCp(cursor.getString(2));
+                pokemonas.setAbilities(cursor.getString(3));
+                pokemonas.setType(cursor.getString(4));
+                pokemonas.setWeight(cursor.getDouble(5));
+                pokemonas.setHeight(cursor.getDouble(6));
+
+                // adding user to list
+                pokemonai.add(pokemonas);
+            } while (cursor.moveToNext());
+        }
+
+        // return pokemonaiSQLite list
+        return pokemonai;
+    }
+
+    public List<Pokemonas> getPokemonByName(String name) {
+        List<Pokemonas> pokemonai = new ArrayList<Pokemonas>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM pokemonai WHERE name LIKE '%"+name+"%'", null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Pokemonas pokemonas = new Pokemonas();
+
+                pokemonas.setId(Integer.parseInt(cursor.getString(0)));
+                pokemonas.setName(cursor.getString(1));
+                pokemonas.setCp(cursor.getString(2));
+                pokemonas.setAbilities(cursor.getString(3));
+                pokemonas.setType(cursor.getString(4));
+                pokemonas.setWeight(cursor.getDouble(5));
+                pokemonas.setHeight(cursor.getDouble(6));
+
+                // adding user to list
+                pokemonai.add(pokemonas);
+            } while (cursor.moveToNext());
+        }
+
+        // return pokemonaiSQLite list
+        return pokemonai;
+
+    }
+
     public boolean isValidUser(String username, String password){
         Cursor c = getReadableDatabase().rawQuery(
                 "SELECT * FROM " + TABLE_USERS + " WHERE "
@@ -131,4 +231,5 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
             return true;
         return false;
     }
+
 }
