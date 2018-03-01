@@ -222,6 +222,25 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
 
     }
 
+    public Pokemonas getPokemonas(int id) {
+        Pokemonas pokemonas = new Pokemonas();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM pokemonai WHERE id = '"+id+"'", null);
+
+        pokemonas.setId(Integer.parseInt(cursor.getString(0)));
+        pokemonas.setName(cursor.getString(1));
+        pokemonas.setCp(cursor.getString(2));
+        pokemonas.setAbilities(cursor.getString(3));
+        pokemonas.setType(cursor.getString(4));
+        pokemonas.setWeight(cursor.getDouble(5));
+        pokemonas.setHeight(cursor.getDouble(6));
+
+        return pokemonas;
+    }
+
+
     public boolean isValidUser(String username, String password){
         Cursor c = getReadableDatabase().rawQuery(
                 "SELECT * FROM " + TABLE_USERS + " WHERE "

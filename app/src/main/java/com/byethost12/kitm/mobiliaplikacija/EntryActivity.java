@@ -13,7 +13,9 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class NewEntryActivity extends AppCompatActivity {
+import static com.byethost12.kitm.mobiliaplikacija.PokemonAdapter.ENTRY_ID;
+
+public class EntryActivity extends AppCompatActivity {
 
     Button btnSubmit;
     EditText etId, etName, etWeight, etHeight;
@@ -24,14 +26,42 @@ public class NewEntryActivity extends AppCompatActivity {
 
     Pokemonas pokemonas;
 
+    DatabaseSQLite db;
+
     String items[] = {"Water", "Fire", "Dark", "Grass"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_entry);
+        setContentView(R.layout.activity_entry);
 
         setTitle(R.string.new_entry_label);
+
+        db = new DatabaseSQLite(EntryActivity.this);
+
+        int entryID = -1;
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(!extras.isEmpty()) {
+                entryID = extras.getInt(ENTRY_ID);
+            }
+        } else { // jeigu yra naujas irasas, id = -1, jeigu egzistuojantis, bus teigiamas
+            entryID = (Integer) savedInstanceState.getSerializable(ENTRY_ID);
+        }
+
+        Pokemonas pokemon = new Pokemonas();
+
+        if (entryID == -1) { //naujas irasas
+            pokemon.setId(-1);
+            pokemon.setName("");
+            pokemon.setAbilities("Vegan");
+            pokemon.setCp("Medium");
+            pokemon.setType("Water");
+            pokemon.setHeight(0);
+            pokemon.setWeight(0);
+        } else { // egzistuojantis irasas
+            pokemon = db.getPokemonas(entryID);
+        }
 
         btnSubmit = (Button) findViewById(R.id.btnAdd);
         etId = (EditText) findViewById(R.id.etId);
@@ -52,6 +82,8 @@ public class NewEntryActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter(this,android.R.layout.simple_dropdown_item_1line,items);
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         spinner.setAdapter(adapter);
+
+        fillFields(pokemonas);
 
 
 
@@ -108,7 +140,10 @@ public class NewEntryActivity extends AppCompatActivity {
                         "Abilities: " + pokemonas.getAbilities() + "\n" +
                         "Type: " + pokemonas.getType());
 
-                Intent goToSearchActivity = new Intent(NewEntryActivity.this, SearchActivity.class);
+
+                db.addPokemon(pokemonas);
+
+                Intent goToSearchActivity = new Intent(EntryActivity.this, SearchActivity.class);
                 startActivity(goToSearchActivity);
             }
         });
@@ -116,5 +151,15 @@ public class NewEntryActivity extends AppCompatActivity {
 
     public void toastMessage(String message){
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void fillFields (Pokemonas pokemonas){
+        etName.setText(pokemonas.getName());
+        etHeight.setText(String.valueOf(pokemonas.getHeight()));
+        etWeight.setText(String.valueOf(pokemonas.getWeight()));
+
+        cbInvisible.setSelected(pokemonas.getAbilities().contains("Invisible"));
+        cbVegan.setSelected(pokemonas.getAbilities().contains("Vegan"));
+        cbTwoHeads.setSelected(pokemonas.getAbilities().contains("Two heads"));
     }
 }

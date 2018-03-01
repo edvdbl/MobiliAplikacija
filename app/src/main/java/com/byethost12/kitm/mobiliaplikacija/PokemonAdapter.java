@@ -21,7 +21,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Pokemonas> pokemonai = Collections.emptyList();
     //private Pokemonas currentPokemon;
 
-    public static final String ENTRY = "com.byethost12.kitm.mobiliaplikacija";
+    public static final String ENTRY_ID = "com.byethost12.kitm.mobiliaplikacija";
 
     //konstruktorius reikalingas susieti
     // esama langa ir perduoti sarasa pokemonui is DB
@@ -80,9 +80,9 @@ public class PokemonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             // TODO: siųsti pasirinkto pokemono objektą vietoj id
             Pokemonas pokemonas = pokemonai.get(itemPosition);
 
-            Intent intent = new Intent(context, NewEntryActivity.class);
+            Intent intent = new Intent(context, EntryActivity.class);
 
-            intent.putExtra(ENTRY, pokemonaiID);
+            intent.putExtra(ENTRY_ID, pokemonaiID);
             context.startActivity(intent);
         }
     }

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.byethost12.kitm.mobiliaplikacija.PokemonAdapter.ENTRY_ID;
+
 public class SearchActivity extends AppCompatActivity {
     SearchView searchView = null;
 
@@ -55,7 +57,8 @@ public class SearchActivity extends AppCompatActivity {
         btnPrideti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SearchActivity.this, NewEntryActivity.class);
+                Intent intent = new Intent(SearchActivity.this, EntryActivity.class);
+                intent.putExtra(ENTRY_ID, -1);
                 startActivity(intent);
             }
         });

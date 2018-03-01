@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NewEntryActivity">
+        <activity android:name=".EntryActivity">
         </activity>
         <activity android:name=".RegisterActivity">
         </activity>
