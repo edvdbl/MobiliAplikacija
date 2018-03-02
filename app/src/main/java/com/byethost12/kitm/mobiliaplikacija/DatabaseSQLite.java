@@ -225,19 +225,25 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
     public Pokemonas getPokemonas(int id) {
         Pokemonas pokemonas = new Pokemonas();
 
+        List<Pokemonas> pokemonai = new ArrayList<Pokemonas>();
+
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM pokemonai WHERE id = '"+id+"'", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM pokemonai WHERE id = " + id + "", null);
+        if (cursor.moveToFirst()) {
+            do {
+                pokemonas.setId(Integer.parseInt(cursor.getString(0)));
+                pokemonas.setName(cursor.getString(1));
+                pokemonas.setCp(cursor.getString(2));
+                pokemonas.setAbilities(cursor.getString(3));
+                pokemonas.setType(cursor.getString(4));
+                pokemonas.setWeight(cursor.getDouble(5));
+                pokemonas.setHeight(cursor.getDouble(6));
 
-        pokemonas.setId(Integer.parseInt(cursor.getString(0)));
-        pokemonas.setName(cursor.getString(1));
-        pokemonas.setCp(cursor.getString(2));
-        pokemonas.setAbilities(cursor.getString(3));
-        pokemonas.setType(cursor.getString(4));
-        pokemonas.setWeight(cursor.getDouble(5));
-        pokemonas.setHeight(cursor.getDouble(6));
-
-        return pokemonas;
+                pokemonai.add(pokemonas);
+            } while (cursor.moveToNext());
+        }
+        return pokemonai.get(0);
     }
 
 
@@ -251,4 +257,15 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
         return false;
     }
 
+    public void updatePokemon(Pokemonas pokemon){
+        ContentValues cv = new ContentValues();
+        cv.put(POKEMON_NAME,pokemon.getName());
+        cv.put(POKEMON_CP,pokemon.getCp());
+        cv.put(POKEMON_ABILITIES,pokemon.getAbilities());
+        cv.put(POKEMON_TYPE,pokemon.getType());
+        cv.put(POKEMON_WEIGHT,pokemon.getWeight());
+        cv.put(POKEMON_HEIGHT,pokemon.getHeight());
+
+        getReadableDatabase().update(TABLE_POKEMONS, cv, " id = "+pokemon.getId(), null);
+    }
 }

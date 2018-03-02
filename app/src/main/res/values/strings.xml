@@ -4,10 +4,10 @@
     <string name="login_label">Prisijungimas</string>
     <string name="register_label">Naujas vartotojas</string>
     <string name="search_label">Paieška</string>
-    <string name="new_entry_label">Naujas įrašas</string>
+    <string name="new_entry_label">Įrašo kūrimas</string>
+    <string name="entry_update_label">Įrašo redagavimas</string>
 
     <string name="login_invalid_username">Klaidingai įvestas prisijungimo vardas</string>
     <string name="login_invalid_password">Klaidingai įvestas slaptažodis</string>
-
 
 </resources>

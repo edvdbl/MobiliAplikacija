@@ -1,8 +1,8 @@
 package com.byethost12.kitm.mobiliaplikacija;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -11,18 +11,19 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import static com.byethost12.kitm.mobiliaplikacija.PokemonAdapter.ENTRY_ID;
 
 public class EntryActivity extends AppCompatActivity {
 
-    Button btnSubmit;
-    EditText etId, etName, etWeight, etHeight;
+    Button btnSubmit, btnUpdate;
+
+    EditText etName, etWeight, etHeight;
     RadioGroup rbGroup;
     RadioButton rbStrong, rbMedium, rbWeak;
     CheckBox cbVegan, cbInvisible, cbTwoHeads;
     Spinner spinner;
+    ArrayAdapter<String> adapter;
 
     Pokemonas pokemonas;
 
@@ -34,8 +35,6 @@ public class EntryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-
-        setTitle(R.string.new_entry_label);
 
         db = new DatabaseSQLite(EntryActivity.this);
 
@@ -49,22 +48,36 @@ public class EntryActivity extends AppCompatActivity {
             entryID = (Integer) savedInstanceState.getSerializable(ENTRY_ID);
         }
 
-        Pokemonas pokemon = new Pokemonas();
+        if (entryID == -1) {
+            setTitle(R.string.new_entry_label);
+        } else {
+            setTitle(R.string.entry_update_label);
+        }
 
+        pokemonas = new Pokemonas();
         if (entryID == -1) { //naujas irasas
-            pokemon.setId(-1);
-            pokemon.setName("");
-            pokemon.setAbilities("Vegan");
-            pokemon.setCp("Medium");
-            pokemon.setType("Water");
-            pokemon.setHeight(0);
-            pokemon.setWeight(0);
+            pokemonas.setId(-1);
+            pokemonas.setName("");
+            pokemonas.setAbilities("Vegan");
+            pokemonas.setCp("Medium");
+            pokemonas.setType("Water");
+            pokemonas.setHeight(0);
+            pokemonas.setWeight(0);
         } else { // egzistuojantis irasas
-            pokemon = db.getPokemonas(entryID);
+           pokemonas = db.getPokemonas(entryID);
         }
 
         btnSubmit = (Button) findViewById(R.id.btnAdd);
-        etId = (EditText) findViewById(R.id.etId);
+        btnUpdate = (Button) findViewById(R.id.btnUpdate);
+
+        if (entryID == -1){ //naujas irasas - disable update button
+            btnUpdate.setEnabled(false);
+            btnSubmit.setEnabled(true);
+        }else { // egzistuojantis irasas - disable submit
+            btnUpdate.setEnabled(true);
+            btnSubmit.setEnabled(false);
+        }
+
         etName = (EditText) findViewById(R.id.etName);
         etWeight = (EditText) findViewById(R.id.etWeight);
         etHeight = (EditText) findViewById(R.id.etHeight);
@@ -79,67 +92,16 @@ public class EntryActivity extends AppCompatActivity {
         cbTwoHeads = (CheckBox) findViewById(R.id.cbTwoHeads);
 
         spinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter(this,android.R.layout.simple_dropdown_item_1line,items);
+        adapter = new ArrayAdapter(this,android.R.layout.simple_dropdown_item_1line,items);
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         spinner.setAdapter(adapter);
 
         fillFields(pokemonas);
 
-
-
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = Integer.parseInt(etId.getText().toString());
-                String name = etName.getText().toString();
-                double weight = Double.parseDouble(etWeight.getText().toString());
-                double height = Double.parseDouble(etHeight.getText().toString());
-                String rb = "";
-                String spinnerText = "";
-
-
-
-                if(rbStrong.isChecked()){
-                    rb = rbStrong.getText().toString();
-                }else if(rbMedium.isChecked()){
-                    rb = rbMedium.getText().toString();
-                }else{
-                    rb = rbWeak.getText().toString();
-                }
-
-                String checkboxText = "";
-
-                if(cbVegan.isChecked()){
-                    checkboxText = checkboxText + "Vegan,";
-                }
-
-                if(cbInvisible.isChecked()){
-                    checkboxText = checkboxText + "Invisible,";
-                }
-
-                if(cbTwoHeads.isChecked()){
-                    checkboxText = checkboxText + "Two heads";
-                }
-
-                spinnerText = spinner.getSelectedItem().toString();
-
-                pokemonas = new Pokemonas();
-                pokemonas.setId(id);
-                pokemonas.setName(name);
-                pokemonas.setHeight(height);
-                pokemonas.setWeight(weight);
-                pokemonas.setAbilities(checkboxText);
-                pokemonas.setCp(rb);
-                pokemonas.setType(spinnerText);
-
-                toastMessage("ID: " + pokemonas.getId() + "\n" +
-                        "Name: " + pokemonas.getName() + "\n" +
-                        "Weight: " + pokemonas.getWeight() + "\n" +
-                        "Height: " + pokemonas.getHeight() + "\n" +
-                        "CP: " + pokemonas.getCp() + "\n" +
-                        "Abilities: " + pokemonas.getAbilities() + "\n" +
-                        "Type: " + pokemonas.getType());
-
+                getFields();
 
                 db.addPokemon(pokemonas);
 
@@ -147,10 +109,58 @@ public class EntryActivity extends AppCompatActivity {
                 startActivity(goToSearchActivity);
             }
         });
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFields();
+
+                db.updatePokemon(pokemonas);
+
+                Intent goToSearchActivity = new Intent(EntryActivity.this, SearchActivity.class);
+                startActivity(goToSearchActivity);
+            }
+        });
     }
 
-    public void toastMessage(String message){
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    private void getFields(){
+        String name = etName.getText().toString();
+        double weight = Double.parseDouble(etWeight.getText().toString());
+        double height = Double.parseDouble(etHeight.getText().toString());
+        String rb = "";
+        String spinnerText = "";
+
+        if(rbStrong.isChecked()){
+            rb = rbStrong.getText().toString();
+        }else if(rbMedium.isChecked()){
+            rb = rbMedium.getText().toString();
+        }else{
+            rb = rbWeak.getText().toString();
+        }
+
+        String checkboxText = "";
+
+        if(cbVegan.isChecked()){
+            checkboxText = checkboxText + "Vegan,";
+        }
+
+        if(cbInvisible.isChecked()){
+            checkboxText = checkboxText + "Invisible,";
+        }
+
+        if(cbTwoHeads.isChecked()){
+            checkboxText = checkboxText + "Two heads";
+        }
+
+        spinnerText = spinner.getSelectedItem().toString();
+
+        pokemonas.setId(pokemonas.getId());
+        pokemonas.setName(name);
+        pokemonas.setHeight(height);
+        pokemonas.setWeight(weight);
+        pokemonas.setAbilities(checkboxText);
+        pokemonas.setCp(rb);
+        pokemonas.setType(spinnerText);
     }
 
     private void fillFields (Pokemonas pokemonas){
@@ -158,8 +168,14 @@ public class EntryActivity extends AppCompatActivity {
         etHeight.setText(String.valueOf(pokemonas.getHeight()));
         etWeight.setText(String.valueOf(pokemonas.getWeight()));
 
-        cbInvisible.setSelected(pokemonas.getAbilities().contains("Invisible"));
-        cbVegan.setSelected(pokemonas.getAbilities().contains("Vegan"));
-        cbTwoHeads.setSelected(pokemonas.getAbilities().contains("Two heads"));
+        cbInvisible.setChecked(pokemonas.getAbilities().contains("Invisible"));
+        cbVegan.setChecked(pokemonas.getAbilities().contains("Vegan"));
+        cbTwoHeads.setChecked(pokemonas.getAbilities().contains("Two heads"));
+
+        rbMedium.setChecked(pokemonas.getCp().equals("Medium"));
+        rbStrong.setChecked(pokemonas.getCp().equals("Strong"));
+        rbWeak.setChecked(pokemonas.getCp().equals("Weak"));
+
+        spinner.setSelection(adapter.getPosition(pokemonas.getType()));
     }
 }
