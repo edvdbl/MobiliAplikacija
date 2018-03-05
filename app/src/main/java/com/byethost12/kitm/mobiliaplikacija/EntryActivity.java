@@ -1,8 +1,12 @@
 package com.byethost12.kitm.mobiliaplikacija;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -11,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import static com.byethost12.kitm.mobiliaplikacija.PokemonAdapter.ENTRY_ID;
 
@@ -25,7 +30,8 @@ public class EntryActivity extends AppCompatActivity {
     Spinner spinner;
     ArrayAdapter<String> adapter;
 
-    Pokemonas pokemonas;
+    Pokemonas galutinisPokemonas;
+    Pokemonas pradinisPokemonas;
 
     DatabaseSQLite db;
 
@@ -54,18 +60,21 @@ public class EntryActivity extends AppCompatActivity {
             setTitle(R.string.entry_update_label);
         }
 
-        pokemonas = new Pokemonas();
+        galutinisPokemonas = new Pokemonas();
         if (entryID == -1) { //naujas irasas
-            pokemonas.setId(-1);
-            pokemonas.setName("");
-            pokemonas.setAbilities("Vegan");
-            pokemonas.setCp("Medium");
-            pokemonas.setType("Water");
-            pokemonas.setHeight(0);
-            pokemonas.setWeight(0);
+            galutinisPokemonas.setId(-1);
+            galutinisPokemonas.setName("");
+            galutinisPokemonas.setAbilities("Vegan");
+            galutinisPokemonas.setCp("Medium");
+            galutinisPokemonas.setType("Water");
+            galutinisPokemonas.setHeight(0);
+            galutinisPokemonas.setWeight(0);
         } else { // egzistuojantis irasas
-           pokemonas = db.getPokemonas(entryID);
+           galutinisPokemonas = db.getPokemonas(entryID);
         }
+        pradinisPokemonas = new Pokemonas();
+        pradinisPokemonas.setName(galutinisPokemonas.getName());
+
 
         btnSubmit = (Button) findViewById(R.id.btnAdd);
         btnUpdate = (Button) findViewById(R.id.btnUpdate);
@@ -96,14 +105,14 @@ public class EntryActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         spinner.setAdapter(adapter);
 
-        fillFields(pokemonas);
+        fillFields(galutinisPokemonas);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getFields();
 
-                db.addPokemon(pokemonas);
+                db.addPokemon(galutinisPokemonas);
 
                 Intent goToSearchActivity = new Intent(EntryActivity.this, SearchActivity.class);
                 startActivity(goToSearchActivity);
@@ -115,7 +124,7 @@ public class EntryActivity extends AppCompatActivity {
             public void onClick(View v) {
                 getFields();
 
-                db.updatePokemon(pokemonas);
+                db.updatePokemon(galutinisPokemonas);
 
                 Intent goToSearchActivity = new Intent(EntryActivity.this, SearchActivity.class);
                 startActivity(goToSearchActivity);
@@ -154,13 +163,13 @@ public class EntryActivity extends AppCompatActivity {
 
         spinnerText = spinner.getSelectedItem().toString();
 
-        pokemonas.setId(pokemonas.getId());
-        pokemonas.setName(name);
-        pokemonas.setHeight(height);
-        pokemonas.setWeight(weight);
-        pokemonas.setAbilities(checkboxText);
-        pokemonas.setCp(rb);
-        pokemonas.setType(spinnerText);
+        galutinisPokemonas.setId(galutinisPokemonas.getId());
+        galutinisPokemonas.setName(name);
+        galutinisPokemonas.setHeight(height);
+        galutinisPokemonas.setWeight(weight);
+        galutinisPokemonas.setAbilities(checkboxText);
+        galutinisPokemonas.setCp(rb);
+        galutinisPokemonas.setType(spinnerText);
     }
 
     private void fillFields (Pokemonas pokemonas){
@@ -178,4 +187,60 @@ public class EntryActivity extends AppCompatActivity {
 
         spinner.setSelection(adapter.getPosition(pokemonas.getType()));
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            Log.d("CDA", "onKeyDown Called");
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        getFields();
+        if (!galutinisPokemonas.equals(pradinisPokemonas)) { //Pokemonas buvo pakeistas
+            showDialog();
+        } else {  //Nebuvo pakeistas pokemonas
+            Toast.makeText(EntryActivity.this,"Pokemonas nebuvo pakeistas",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                EntryActivity.this);
+
+        // set title
+        alertDialogBuilder.setTitle("Įspėjimas");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Išsaugoti pakeitimus?")
+                .setCancelable(false)
+                .setPositiveButton("Taip",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("Ne",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        EntryActivity.this.finish();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
 }
+

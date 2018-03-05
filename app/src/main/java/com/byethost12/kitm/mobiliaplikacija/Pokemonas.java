@@ -94,4 +94,16 @@ public class Pokemonas {
                 ", type='" + type + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Pokemonas) {
+            Pokemonas pokemonas = (Pokemonas) o;
+            String pokemonas1 = pokemonas.getName();
+            String pokemonas2 = getName();
+            return pokemonas1.equals(pokemonas2);
+        }
+    return false;
+    }
+
 }
