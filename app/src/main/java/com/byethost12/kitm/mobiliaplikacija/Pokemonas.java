@@ -99,9 +99,18 @@ public class Pokemonas {
     public boolean equals(Object o) {
         if (o instanceof Pokemonas) {
             Pokemonas pokemonas = (Pokemonas) o;
-            String pokemonas1 = pokemonas.getName();
-            String pokemonas2 = getName();
-            return pokemonas1.equals(pokemonas2);
+            boolean name = pokemonas.getName().equals(getName());
+            boolean weight = Double.compare(pokemonas.getWeight(),getWeight())==0;
+            boolean height = Double.compare(pokemonas.getHeight(),getHeight())==0;
+            boolean cp = pokemonas.getCp().equals(getCp());
+            boolean abilities = pokemonas.getAbilities().equals(getAbilities());
+            boolean type = pokemonas.getType().equals(getType());
+            return (name
+                    &&weight
+                    &&height
+                    &&cp
+                    &&abilities
+                    &&type);
         }
     return false;
     }

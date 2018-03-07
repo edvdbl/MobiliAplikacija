@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,7 +16,6 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import static com.byethost12.kitm.mobiliaplikacija.PokemonAdapter.ENTRY_ID;
 
@@ -30,8 +30,8 @@ public class EntryActivity extends AppCompatActivity {
     Spinner spinner;
     ArrayAdapter<String> adapter;
 
-    Pokemonas galutinisPokemonas;
     Pokemonas pradinisPokemonas;
+    Pokemonas galutinisPokemonas;
 
     DatabaseSQLite db;
 
@@ -41,6 +41,7 @@ public class EntryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         db = new DatabaseSQLite(EntryActivity.this);
 
@@ -60,20 +61,19 @@ public class EntryActivity extends AppCompatActivity {
             setTitle(R.string.entry_update_label);
         }
 
-        galutinisPokemonas = new Pokemonas();
-        if (entryID == -1) { //naujas irasas
-            galutinisPokemonas.setId(-1);
-            galutinisPokemonas.setName("");
-            galutinisPokemonas.setAbilities("Vegan");
-            galutinisPokemonas.setCp("Medium");
-            galutinisPokemonas.setType("Water");
-            galutinisPokemonas.setHeight(0);
-            galutinisPokemonas.setWeight(0);
-        } else { // egzistuojantis irasas
-           galutinisPokemonas = db.getPokemonas(entryID);
-        }
         pradinisPokemonas = new Pokemonas();
-        pradinisPokemonas.setName(galutinisPokemonas.getName());
+        if (entryID == -1) { //naujas irasas
+            pradinisPokemonas.setId(-1);
+            pradinisPokemonas.setName("");
+            pradinisPokemonas.setAbilities("Vegan ");
+            pradinisPokemonas.setCp("Medium");
+            pradinisPokemonas.setType("Water");
+            pradinisPokemonas.setHeight(0);
+            pradinisPokemonas.setWeight(0);
+        } else { // egzistuojantis irasas
+           pradinisPokemonas = db.getPokemonas(entryID);
+        }
+        galutinisPokemonas = new Pokemonas();
 
 
         btnSubmit = (Button) findViewById(R.id.btnAdd);
@@ -105,7 +105,7 @@ public class EntryActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         spinner.setAdapter(adapter);
 
-        fillFields(galutinisPokemonas);
+        fillFields(pradinisPokemonas);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,9 +123,7 @@ public class EntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getFields();
-
                 db.updatePokemon(galutinisPokemonas);
-
                 Intent goToSearchActivity = new Intent(EntryActivity.this, SearchActivity.class);
                 startActivity(goToSearchActivity);
             }
@@ -150,20 +148,20 @@ public class EntryActivity extends AppCompatActivity {
         String checkboxText = "";
 
         if(cbVegan.isChecked()){
-            checkboxText = checkboxText + "Vegan,";
+            checkboxText = checkboxText + "Vegan ";
         }
 
         if(cbInvisible.isChecked()){
-            checkboxText = checkboxText + "Invisible,";
+            checkboxText = checkboxText + "Invisible ";
         }
 
         if(cbTwoHeads.isChecked()){
-            checkboxText = checkboxText + "Two heads";
+            checkboxText = checkboxText + "Two heads ";
         }
 
         spinnerText = spinner.getSelectedItem().toString();
 
-        galutinisPokemonas.setId(galutinisPokemonas.getId());
+        galutinisPokemonas.setId(pradinisPokemonas.getId());
         galutinisPokemonas.setName(name);
         galutinisPokemonas.setHeight(height);
         galutinisPokemonas.setWeight(weight);
@@ -202,14 +200,23 @@ public class EntryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        getFields();
-        if (!galutinisPokemonas.equals(pradinisPokemonas)) { //Pokemonas buvo pakeistas
-            showDialog();
-        } else {  //Nebuvo pakeistas pokemonas
-            Toast.makeText(EntryActivity.this,"Pokemonas nebuvo pakeistas",Toast.LENGTH_LONG).show();
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                getFields();
+                if (pradinisPokemonas.equals(galutinisPokemonas)) { //Nebuvo pakeistas
+                    finish();
+                } else {  //Buvo pakeistas
+                    showDialog();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
-
     private void showDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 EntryActivity.this);
@@ -223,8 +230,7 @@ public class EntryActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Taip",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        // if this button is clicked, just close
-                        // the dialog box and do nothing
+
                         dialog.cancel();
                     }
                 })
