@@ -38,7 +38,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle(R.string.search_label);
 
         db = new DatabaseSQLite(SearchActivity.this);
@@ -83,7 +83,17 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    @Override
+    public void onBackPressed() {
+
     }
 
     @Override
