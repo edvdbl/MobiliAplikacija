@@ -144,17 +144,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <Button
-                android:id="@+id/btnAdd"
-                android:text="SUBMIT"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnUpdate"
-                android:text="UPDATE"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <Button
+                    android:id="@+id/btnAdd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/colorYellow"
+                    android:text="SUBMIT" />
+
+                <Button
+                    android:id="@+id/btnUpdate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/colorGreen"
+                    android:text="UPDATE" />
+                <!--TODO not implemented-->
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/colorRed"
+                    android:text="DELETE" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

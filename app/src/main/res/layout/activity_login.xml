@@ -60,17 +60,25 @@
         android:layout_width="match_parent"
         android:layout_height="25dp" />
 
-    <Button
-        android:id="@+id/login"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Prisijungti"/>
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Registruotis"/>
+        <Button
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Prisijungti" />
+
+        <Button
+            android:id="@+id/register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Registruotis" />
+    </LinearLayout>
 
     <CheckBox
         android:id="@+id/rememberMe"
