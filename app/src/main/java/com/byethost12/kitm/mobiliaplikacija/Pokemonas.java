@@ -6,6 +6,7 @@ package com.byethost12.kitm.mobiliaplikacija;
 
 public class Pokemonas {
     private int id;
+    private String user;
     private String name;
     private double weight;
     private double height;
@@ -13,8 +14,10 @@ public class Pokemonas {
     private String abilities;
     private String type;
 
-    public Pokemonas(int id, String name, double weight, double height, String cp, String abilities, String type) {
+    //Naudojamas cloudui
+    public Pokemonas(int id,String user, String name, double weight, double height, String cp, String abilities, String type) {
         this.id = id;
+        this.user = user;
         this.name = name;
         this.weight = weight;
         this.height = height;
@@ -33,6 +36,10 @@ public class Pokemonas {
     public void setId(int id) {
         this.id = id;
     }
+
+    public String getUser() {return user;}
+
+    public void setUser(String user) {this.user = user;}
 
     public String getName() {
         return name;
