@@ -26,6 +26,16 @@ public class Pokemonas {
         this.type = type;
     }
 
+    //JUnit testavimui
+    public Pokemonas(String name, double weight, double height, String cp, String abilities, String type) {
+        this.name = name;
+        this.weight = weight;
+        this.height = height;
+        this.cp = cp;
+        this.abilities = abilities;
+        this.type = type;
+    }
+
     public Pokemonas() {
     }
 
